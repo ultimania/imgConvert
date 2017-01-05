@@ -25,6 +25,12 @@ public interface convertModel {
 
 	/**
 	 *
+	 * @return grubcut matrix
+	 */
+	public Mat grabCut();
+
+	/**
+	 *
 	 */
 	public void post_proc();
 }

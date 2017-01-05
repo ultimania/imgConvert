@@ -26,48 +26,44 @@ public class ImgConv implements convertModel {
 
 	private final static String IMAGE_FILE = "D:/dev/test.jpg";
 	private static drowImage drowimage = null;
-	private String image_name,threshold_name,contor_name,bgtr_name;
-	private Mat src,hierarchy,invsrc;
+	private String image_name, threshold_name, contor_name, bgtr_name,grabcut_name;
+	private Mat src, hierarchy, invsrc;
 
 	public static void main(String[] args) {
 
-		ImgConv imgconv = new ImgConv();
-		imgconv.binarization(0);
-		imgconv.contourDetection();
-		imgconv.backgroundTransparency();
-
-		drowimage.drow();
-		imgconv.post_proc();
+		// Load OpenCV Module
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		drowimage = new drowImage();
 
 	}
 
 	public ImgConv() {
+		// Backup base image file
 		image_name = IMAGE_FILE;
-	}
-
-	public ImgConv(String filename) throws FileNotFoundException{
-		//argumment chack
-		if(! new File(filename).exists()){
-			throw new FileNotFoundException();
-		}
-		image_name = filename;
-	}
-
-	@Override
-	public Mat binarization(int threshold) {
-
-		//Backup base image file
 		try {
 			Files.copy(Paths.get(image_name), Paths.get("./copy.tmp"), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//Load OpenCV Module
-		System.loadLibrary("opencv_java2413");
-		//Create GUI
-		drowimage = new drowImage();
-		drowimage.addImage(image_name);
-		//Load base image file
+	}
+
+	public ImgConv(String filename) throws FileNotFoundException {
+		// argumment chack
+		if (!new File(filename).exists()) {
+			throw new FileNotFoundException();
+		}
+		image_name = filename;
+		try {
+			Files.copy(Paths.get(image_name), Paths.get("./copy.tmp"), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public Mat binarization(int threshold) {
+
+		// Load base image file
 		src = Highgui.imread(image_name, 0);
 		invsrc = src.clone();
 		Core.bitwise_not(src, invsrc);
@@ -78,7 +74,7 @@ public class ImgConv implements convertModel {
 			Imgproc.threshold(src, invsrc, threshold, 255, Imgproc.THRESH_BINARY);
 		}
 
-		threshold_name = image_name.substring(0,image_name.length()-4) + "_threshold.jpg";
+		threshold_name = image_name.substring(0, image_name.length() - 4) + "_threshold.jpg";
 		Highgui.imwrite(threshold_name, invsrc);
 		drowimage.addImage(threshold_name);
 
@@ -89,18 +85,18 @@ public class ImgConv implements convertModel {
 	public Mat contourDetection() {
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
-		//2値化されていない場合は2値化を実施
-		if(invsrc == null){
+		// 2値化されていない場合は2値化を実施
+		if (invsrc == null) {
 			this.binarization(0);
 		}
 
-		//Contor detection
+		// Contor detection
 		hierarchy = Mat.zeros(new Size(5, 5), CvType.CV_8UC1);
 		Imgproc.findContours(invsrc, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_TC89_L1);
 		Mat dst = Mat.zeros(new Size(src.width(), src.height()), CvType.CV_8UC3);
 		Scalar color = new Scalar(255, 255, 255);
 
-		//drow contor line
+		// drow contor line
 		for (int i = 0; i < contours.size(); i++) {
 			MatOfPoint ptmat = contours.get(i);
 
@@ -121,8 +117,8 @@ public class ImgConv implements convertModel {
 
 		}
 
-		//Drow image
-		contor_name = image_name.substring(0,image_name.length()-4) + "_contor.jpg";
+		// Drow image
+		contor_name = image_name.substring(0, image_name.length() - 4) + "_contor.jpg";
 		Highgui.imwrite(contor_name, dst);
 		drowimage.addImage(contor_name);
 
@@ -131,31 +127,31 @@ public class ImgConv implements convertModel {
 
 	@Override
 	public Mat backgroundTransparency() {
-		//binarization
+		// binarization
 		Mat bin_image = this.binarization(0);
 
-		//create alpha matrix
-		Mat base_image = Highgui.imread(image_name,-1);
-		Mat alpha_image = new Mat(bin_image.size(),CvType.CV_8UC3);
+		// create alpha matrix
+		Mat base_image = Highgui.imread(image_name, -1);
+		Mat alpha_image = new Mat(bin_image.size(), CvType.CV_8UC3);
 		Imgproc.cvtColor(base_image, alpha_image, 0);
 
-		//black backgroud transparency
-		double[] data ;
-		for(int i = 0; i < bin_image.rows(); ++i){
-			for(int j = 0; j < bin_image.cols(); ++j){
+		// black backgroud transparency
+		double[] data;
+		for (int i = 0; i < bin_image.rows(); ++i) {
+			for (int j = 0; j < bin_image.cols(); ++j) {
 				data = alpha_image.get(i, j);
-				if( bin_image.get(i, j)[0] == 255 ){
+				if (bin_image.get(i, j)[0] == 255) {
 					data[3] = 0;
 				}
 				alpha_image.put(i, j, data);
 			}
 		}
 
-		//Overlay alpha matrix above base image
+		// Overlay alpha matrix above base image
 
-		//white backgroud transparency
+		// white backgroud transparency
 
-		bgtr_name = image_name.substring(0,image_name.length()-4) + "_bgtr.png";
+		bgtr_name = image_name.substring(0, image_name.length() - 4) + "_bgtr.png";
 		Highgui.imwrite(bgtr_name, alpha_image);
 		drowimage.addImage(bgtr_name);
 
@@ -164,16 +160,37 @@ public class ImgConv implements convertModel {
 
 	@Override
 	public void post_proc() {
-		//Restore base image file
+		// Restore base image file
 		try {
 			Files.copy(Paths.get("./copy.tmp"), Paths.get(image_name), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//Delete temporary file
+		// Delete temporary file
 		new File(threshold_name).delete();
 		new File(contor_name).delete();
-		//new File(bgtr_name).delete();
+		new File(bgtr_name).delete();
+		new File(grabcut_name).delete();
+	}
+
+	@Override
+	public Mat grabCut() {
+		Mat im = Highgui.imread(image_name); // 入力画像の取得
+		Mat mask = new Mat(); // マスク画像用
+		Mat bgModel = new Mat(); // 背景モデル用
+		Mat fgModel = new Mat(); // 前景モデル用
+		Rect rect = new Rect(20, 140, 170, 220); // 大まかな前景と背景の境目(矩形)
+		Mat source = new Mat(1, 1, CvType.CV_8U, new Scalar(3));
+		Imgproc.grabCut(im, mask, rect, bgModel, fgModel, 1, 0); // グラフカットで前景と背景を分離
+		Core.compare(mask, source, mask, Core.CMP_EQ);
+		Mat fg = new Mat(im.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
+		// 前景画像用
+		im.copyTo(fg, mask); // 前景画像の作成
+
+		grabcut_name = image_name.substring(0, image_name.length() - 4) + "_grabcut.jpg";
+		Highgui.imwrite(grabcut_name, fg);
+		drowimage.addImage(grabcut_name);
+		return fg;
 	}
 
 }
