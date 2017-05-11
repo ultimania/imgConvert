@@ -36,7 +36,7 @@ public class drowImage implements drowModel {
 	private ImageIcon icon;
 
 	// ImgConv
-	ImgConv imgconv;
+	MyImage imgconv;
 
 	private final static int WIDTH = 800;
 	private final static int HEIGHT = 600;
@@ -78,7 +78,7 @@ public class drowImage implements drowModel {
 					addImage(filename);
 
 					try {
-						imgconv = new ImgConv(filename);
+						imgconv = new MyImage(filename);
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
 					}

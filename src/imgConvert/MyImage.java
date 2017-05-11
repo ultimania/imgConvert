@@ -17,18 +17,28 @@ import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import MyException.FileNotFoundException;
 
-public class ImgConv implements convertModel {
+/**
+ * 
+ * 
+ * @author fukaya
+ */
+public class MyImage implements convertModel {
 
 	private final static String IMAGE_FILE = "D:/dev/test.jpg";
 	private static drowImage drowimage = null;
 	private String image_name, threshold_name, contor_name, bgtr_name,grabcut_name;
 	private Mat src, hierarchy, invsrc;
 
+        /**
+         * 
+         * 
+         * @param args 
+         */
 	public static void main(String[] args) {
 
 		// Load OpenCV Module
@@ -37,7 +47,7 @@ public class ImgConv implements convertModel {
 
 	}
 
-	public ImgConv() {
+	public MyImage() {
 		// Backup base image file
 		image_name = IMAGE_FILE;
 		try {
@@ -47,7 +57,7 @@ public class ImgConv implements convertModel {
 		}
 	}
 
-	public ImgConv(String filename) throws FileNotFoundException {
+	public MyImage(String filename) throws FileNotFoundException {
 		// argumment chack
 		if (!new File(filename).exists()) {
 			throw new FileNotFoundException();
@@ -64,7 +74,7 @@ public class ImgConv implements convertModel {
 	public Mat binarization(int threshold) {
 
 		// Load base image file
-		src = Highgui.imread(image_name, 0);
+		src = Imgcodecs.imread(image_name, 0);
 		invsrc = src.clone();
 		Core.bitwise_not(src, invsrc);
 
@@ -75,7 +85,7 @@ public class ImgConv implements convertModel {
 		}
 
 		threshold_name = image_name.substring(0, image_name.length() - 4) + "_threshold.jpg";
-		Highgui.imwrite(threshold_name, invsrc);
+		Imgcodecs.imwrite(threshold_name, invsrc);
 		drowimage.addImage(threshold_name);
 
 		return invsrc;
@@ -111,15 +121,15 @@ public class ImgConv implements convertModel {
 			MatOfPoint2f ptmat2 = new MatOfPoint2f(ptmat.toArray());
 			RotatedRect bbox = Imgproc.minAreaRect(ptmat2);
 			Rect box = bbox.boundingRect();
-			Core.circle(dst, bbox.center, 5, color, -1);
+			//Core.circle(dst, bbox.center, 5, color, -1);
 			color = new Scalar(0, 255, 0);
-			Core.rectangle(dst, box.tl(), box.br(), color, 2);
+			//Core.rectangle(dst, box.tl(), box.br(), color, 2);
 
 		}
 
 		// Drow image
 		contor_name = image_name.substring(0, image_name.length() - 4) + "_contor.jpg";
-		Highgui.imwrite(contor_name, dst);
+		Imgcodecs.imwrite(contor_name, dst);
 		drowimage.addImage(contor_name);
 
 		return dst;
@@ -131,7 +141,7 @@ public class ImgConv implements convertModel {
 		Mat bin_image = this.binarization(0);
 
 		// create alpha matrix
-		Mat base_image = Highgui.imread(image_name, -1);
+		Mat base_image = Imgcodecs.imread(image_name, -1);
 		Mat alpha_image = new Mat(bin_image.size(), CvType.CV_8UC3);
 		Imgproc.cvtColor(base_image, alpha_image, 0);
 
@@ -152,7 +162,7 @@ public class ImgConv implements convertModel {
 		// white backgroud transparency
 
 		bgtr_name = image_name.substring(0, image_name.length() - 4) + "_bgtr.png";
-		Highgui.imwrite(bgtr_name, alpha_image);
+		Imgcodecs.imwrite(bgtr_name, alpha_image);
 		drowimage.addImage(bgtr_name);
 
 		return alpha_image;
@@ -175,7 +185,7 @@ public class ImgConv implements convertModel {
 
 	@Override
 	public Mat grabCut() {
-		Mat im = Highgui.imread(image_name); // 入力画像の取得
+		Mat im = Imgcodecs.imread(image_name); // 入力画像の取得
 		Mat mask = new Mat(); // マスク画像用
 		Mat bgModel = new Mat(); // 背景モデル用
 		Mat fgModel = new Mat(); // 前景モデル用
@@ -188,7 +198,7 @@ public class ImgConv implements convertModel {
 		im.copyTo(fg, mask); // 前景画像の作成
 
 		grabcut_name = image_name.substring(0, image_name.length() - 4) + "_grabcut.jpg";
-		Highgui.imwrite(grabcut_name, fg);
+		Imgcodecs.imwrite(grabcut_name, fg);
 		drowimage.addImage(grabcut_name);
 		return fg;
 	}
