@@ -23,8 +23,16 @@ import org.opencv.imgproc.Imgproc;
 import MyException.FileNotFoundException;
 
 /**
- * 
- * 
+ * This class converts imported image files.
+ * There are four conversion methods as follows.
+ *  · Binarization
+ *  · Contour extraction
+ *  · Transparent background
+ *  · Foreground extraction
+ * Read the image file to be converted when instance is created.
+ * One image file is linked to one generated MyImage instance.
+ * If you create an instance without specifying an image file,
+ * you must call the reading method.
  * @author fukaya
  */
 public class MyImage implements convertModel {
@@ -35,8 +43,8 @@ public class MyImage implements convertModel {
 	private Mat src, hierarchy, invsrc;
 
         /**
-         * 
-         * 
+         * The main method loads the opencv module,
+         * and draws the initial screen.
          * @param args 
          */
 	public static void main(String[] args) {
@@ -47,6 +55,10 @@ public class MyImage implements convertModel {
 
 	}
 
+        /**
+         * The constructor reads the specified image file and creates a copy for conversion.
+         * If reading of an image fails, an exception is returned.
+         */
 	public MyImage() {
 		// Backup base image file
 		image_name = IMAGE_FILE;
