@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 
 import MyException.FileNotFoundException;
 
-public class drowImage implements drowModel {
+public class drowImage implements DrowImp {
 	// Frame Layer
 	private JFrame mainFrame;
 
@@ -46,7 +46,7 @@ public class drowImage implements drowModel {
 		this.drow();
 	}
 
-	@Override
+	//@Override
 	public void createGUI() {
 		// convList
 		String initData[] = { "通常画像", "2値化", "輪郭検出", "背景透過", "前景抽出" };

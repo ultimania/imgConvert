@@ -5,11 +5,17 @@
  */
 package imgConvert;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+
 /**
  *
  * @author fukaya
  */
-public class MainController extends javax.swing.JFrame {
+public class MainController extends javax.swing.JFrame implements DrowImp {
 
     /**
      * Creates new form NewJFrame
@@ -27,11 +33,13 @@ public class MainController extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        fileChooser = new javax.swing.JFileChooser();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        textField = new javax.swing.JTextField();
         drowPanel = new javax.swing.JPanel();
+        drowArea = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -52,12 +60,12 @@ public class MainController extends javax.swing.JFrame {
             }
         });
 
-        jTextField1.setText("　変換する画像を選択してください");
-        jTextField1.setFocusable(false);
-        jTextField1.setVerifyInputWhenFocusTarget(false);
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        textField.setText("　変換する画像を選択してください");
+        textField.setFocusable(false);
+        textField.setVerifyInputWhenFocusTarget(false);
+        textField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                textFieldActionPerformed(evt);
             }
         });
 
@@ -69,7 +77,7 @@ public class MainController extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -79,7 +87,7 @@ public class MainController extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(textField, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -89,11 +97,13 @@ public class MainController extends javax.swing.JFrame {
         drowPanel.setLayout(drowPanelLayout);
         drowPanelLayout.setHorizontalGroup(
             drowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 340, Short.MAX_VALUE)
+            .addComponent(drowArea, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
         );
         drowPanelLayout.setVerticalGroup(
             drowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 208, Short.MAX_VALUE)
+            .addGroup(drowPanelLayout.createSequentialGroup()
+                .addComponent(drowArea, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jButton2.setText("通常画像");
@@ -181,12 +191,23 @@ public class MainController extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void textFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_textFieldActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        int returnVal = fileChooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try {
+              // What to do with the file, e.g. display it in a TextArea
+              textField.read( new FileReader( file.getAbsolutePath() ), null );
+            } catch (IOException ex) {
+              System.out.println("problem accessing file"+file.getAbsolutePath());
+            }
+        } else {
+            System.out.println("File access cancelled by user.");
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -229,8 +250,24 @@ public class MainController extends javax.swing.JFrame {
         });
     }
 
+    @Override
+    public void addImage(String imageFile) {
+	ImageIcon imageicon = new ImageIcon(imageFile);
+        drowArea.setIcon(imageicon);
+
+	this.drow();
+    }
+
+    @Override
+    public void drow() {
+	setVisible(true);
+    }
+
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel drowArea;
     private javax.swing.JPanel drowPanel;
+    private javax.swing.JFileChooser fileChooser;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -241,6 +278,7 @@ public class MainController extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField textField;
     // End of variables declaration//GEN-END:variables
+
 }
